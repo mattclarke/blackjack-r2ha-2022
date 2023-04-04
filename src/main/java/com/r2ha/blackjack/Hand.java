@@ -2,6 +2,7 @@ package com.r2ha.blackjack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -42,8 +43,8 @@ public class Hand {
         return value() <= 16;
     }
 
-    public List<Card> cards() {
-        return List.copyOf(cards);
+    public Stream<Card> cards() {
+        return cards.stream();
     }
 
     public void drawFrom(Deck deck) {
