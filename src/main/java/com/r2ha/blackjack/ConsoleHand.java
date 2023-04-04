@@ -17,7 +17,4 @@ public class ConsoleHand {
                             ansi().cursorUp(6).cursorRight(1).toString()));
     }
 
-    static String displayValue(Hand hand) {
-        return String.valueOf(hand.value());
-    }
 }
