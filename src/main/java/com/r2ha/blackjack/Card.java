@@ -3,16 +3,16 @@ package com.r2ha.blackjack;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Card {
-    public Suit getSuit() {
+    private final Suit suit;
+    private final Rank rank;
+
+    public Suit suit() {
         return suit;
     }
 
-    public Rank getRank() {
+    public Rank rank() {
         return rank;
     }
-
-    private final Suit suit;
-    private final Rank rank;
 
     public Card(Suit suit, Rank rank) {
         this.suit = suit;
