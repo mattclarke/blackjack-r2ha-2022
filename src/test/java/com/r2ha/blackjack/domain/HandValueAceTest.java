@@ -1,4 +1,4 @@
-package com.r2ha.blackjack.adaptor.in.console;
+package com.r2ha.blackjack.domain;
 
 import com.r2ha.blackjack.domain.Card;
 import com.r2ha.blackjack.domain.Hand;
