@@ -1,4 +1,4 @@
-package com.r2ha.blackjack;
+package com.r2ha.blackjack.adaptor.in.console;
 import com.r2ha.blackjack.adaptor.in.console.ConsoleCard;
 import com.r2ha.blackjack.domain.Card;
 import com.r2ha.blackjack.domain.Rank;
