@@ -1,96 +1,33 @@
 package com.r2ha.blackjack.domain;
 
-import com.r2ha.blackjack.adaptor.in.console.ConsoleHand;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
+import com.r2ha.blackjack.adaptor.in.console.ConsoleGame;
 
 import java.io.PrintStream;
-import java.util.Scanner;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
 public class Game {
 
-    private static Scanner scanner;
+    public enum GameResult {
+        PLAYER_BUST,
+        DEALER_BUST,
+        PLAYER_WINS,
+        DRAW,
+        DEALER_WINS;
+    }
+
     private final Deck deck;
-
-    private static PrintStream stream = System.out;
-
     private final Hand dealerHand = new Hand();
     private final Hand playerHand = new Hand();
-
-    public static void main(String[] args) {
-        scanner = new Scanner(System.in);
-        displayWelcomeScreen();
-        waitForEnterFromUser();
-
-        playGame();
-
-        resetScreen();
-    }
-
-    private static void resetScreen() {
-        println(ansi().reset());
-    }
-
-    private static void playGame() {
-        Game game = new Game();
-        game.initialDeal();
-        game.play();
-    }
-
-    private static void waitForEnterFromUser() {
-        println(ansi()
-                                   .cursor(3, 1)
-                                   .fgBrightBlack().a("Hit [ENTER] to start..."));
-
-        scanner.nextLine();
-    }
-
-    private static void displayWelcomeScreen() {
-        AnsiConsole.systemInstall();
-        println(ansi()
-                                   .bgBright(Ansi.Color.WHITE)
-                                   .eraseScreen()
-                                   .cursor(1, 1)
-                                   .fgGreen().a("Welcome to")
-                                   .fgRed().a(" JitterTed's")
-                                   .fgBlack().a(" Blackjack game"));
-    }
-
-    private static void println(Object toPrint) {
-        stream.println(toPrint);
-    }
-
-    private static void println() {
-        stream.println();
-    }
-
-    private static void print(Object toPrint) {
-        stream.print(toPrint);
-    }
+    private boolean playerDone;
 
     public Game() {
         deck = new Deck();
     }
 
-    public static void directOutputTo(PrintStream printStream) {
-        stream = printStream;
-    }
-
     public void initialDeal() {
         dealRoundOfCards();
         dealRoundOfCards();
-    }
-
-    public void play() {
-        playerTurn();
-
-        dealerTurn();
-
-        displayFinalGameState();
-
-        determineOutcome();
     }
 
     private void dealRoundOfCards() {
@@ -99,21 +36,21 @@ public class Game {
         dealerHand.drawFrom(deck);
     }
 
-    private void determineOutcome() {
+    public GameResult determineOutcome() {
         if (playerHand.isBusted()) {
-            println("You Busted, so you lose.  💸");
+            return GameResult.PLAYER_BUST;
         } else if (dealerHand.isBusted()) {
-            println("Dealer went BUST, Player wins! Yay for you!! 💵");
+            return GameResult.DEALER_BUST;
         } else if (playerHand.beats(dealerHand)) {
-            println("You beat the Dealer! 💵");
+            return GameResult.PLAYER_WINS;
         } else if (playerHand.pushes(dealerHand)) {
-            println("Push: Nobody wins, we'll call it even.");
+            return GameResult.DRAW;
         } else {
-            println("You lost to the Dealer. 💸");
+            return GameResult.DEALER_WINS;
         }
     }
 
-    private void dealerTurn() {
+    public void dealerTurn() {
         // Dealer makes its choice automatically based on a simple heuristic (<=16 must hit, =>17 must stand)
         if (!playerHand.isBusted()) {
             while (dealerHand.dealerMustDrawCard()) {
@@ -122,69 +59,25 @@ public class Game {
         }
     }
 
-    private void playerTurn() {
-        // get Player's decision: hit until they stand, then they're done (or they go bust)
-
-        while (!playerHand.isBusted()) {
-            displayGameState();
-            String playerChoice = inputFromPlayer().toLowerCase();
-            if (playerChoice.startsWith("s")) {
-                break;
-            }
-            if (playerChoice.startsWith("h")) {
-                playerHand.drawFrom(deck);
-                if (playerHand.isBusted()) {
-                    return;
-                }
-            } else {
-                println("You need to [H]it or [S]tand");
-            }
-        }
+    public void playerHits() {
+        playerHand.drawFrom(deck);
+        playerDone = playerHand.isBusted();
     }
 
-    private String inputFromPlayer() {
-        println("[H]it or [S]tand?");
-        return scanner.nextLine();
+    public void playerStands() {
+        playerDone = true;
     }
 
-    private void displayGameState() {
-        print(ansi().eraseScreen().cursor(1, 1));
-        println("Dealer has: ");
-        println(ConsoleHand.displayFaceUpCard(dealerHand));
-
-        // second card is the hole card, which is hidden, or "face down"
-        displayBackOfCard();
-
-        println();
-        println("Player has: ");
-        println(ConsoleHand.cardsAsString(playerHand.cards()));
-        println(" (" + playerHand.value() + ")");
+    public boolean isPlayerDone() {
+        return playerDone;
     }
 
-    private void displayBackOfCard() {
-        print(
-                ansi()
-                        .cursorUp(7)
-                        .cursorRight(12)
-                        .a("┌─────────┐").cursorDown(1).cursorLeft(11)
-                        .a("│░░░░░░░░░│").cursorDown(1).cursorLeft(11)
-                        .a("│░ J I T ░│").cursorDown(1).cursorLeft(11)
-                        .a("│░ T E R ░│").cursorDown(1).cursorLeft(11)
-                        .a("│░ T E D ░│").cursorDown(1).cursorLeft(11)
-                        .a("│░░░░░░░░░│").cursorDown(1).cursorLeft(11)
-                        .a("└─────────┘"));
+    public Hand playerHand() {
+        return new Hand(playerHand.cards().toList());
     }
 
-    private void displayFinalGameState() {
-        print(ansi().eraseScreen().cursor(1, 1));
-        println("Dealer has: ");
-        println(ConsoleHand.cardsAsString(dealerHand.cards()));
-        println(" (" + dealerHand.value() + ")");
-
-        println();
-        println("Player has: ");
-        println(ConsoleHand.cardsAsString(playerHand.cards()));
-        println(" (" + playerHand.value() + ")");
+    public Hand dealerHand() {
+        return new Hand(dealerHand.cards().toList());
     }
 
 }

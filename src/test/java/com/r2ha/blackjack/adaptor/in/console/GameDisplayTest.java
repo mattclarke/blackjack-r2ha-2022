@@ -1,5 +1,6 @@
 package com.r2ha.blackjack.adaptor.in.console;
 
+import com.r2ha.blackjack.Blackjack;
 import com.r2ha.blackjack.domain.Game;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -32,9 +33,9 @@ public class GameDisplayTest {
         provideInput("\nS\n");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(baos);
-        Game.directOutputTo(printStream);
+        ConsoleGame.directOutputTo(printStream);
         // Starts the game with an empty String array for the arguments.
-        Game.main(new String[0]);
+        Blackjack.main(new String[0]);
         String output = baos.toString().replaceAll("\u001B\\[[\\d;]*[^\\d;]",
                                                    "\n");
 
