@@ -110,7 +110,7 @@ public class ConsoleGame {
         }
     }
 
-    private void displayGameState(final Hand dealerHand, final Hand playerHand, final boolean handFinished) {
+    private void displayGameState(Hand dealerHand, Hand playerHand, boolean handFinished) {
         print(ansi().eraseScreen().cursor(1, 1));
         println("Dealer has: ");
 
