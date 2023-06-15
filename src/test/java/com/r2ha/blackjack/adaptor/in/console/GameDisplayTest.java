@@ -80,6 +80,13 @@ public class GameDisplayTest {
         }
 
         assertThat(numTops).isEqualTo(numBottoms);
+
+        assertThat(output).containsAnyOf(
+                "You Busted, so you lose.  💸",
+                "Dealer went BUST, Player wins! Yay for you!! 💵",
+                "You beat the Dealer! 💵",
+                "Push: Nobody wins, we'll call it even.",
+                "You lost to the Dealer. 💸");
     }
 
 }
